@@ -66,6 +66,8 @@ public class Vehicle {
         this.sold = sold;
     }
 
+
+
     public String getColor() {
         return color;
     }

@@ -15,16 +15,83 @@ public class VehicleDao {
     }
 
     public void addVehicle(Vehicle vehicle) {
-        // TODO: Implement the logic to add a vehicle
+        String query = "insert into vehicles (vin, make, model, year, sold, color, vehicleType, odometer, price) Values (?, ?, ?, ?, ?, ?, ?, ?, ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, vehicle.getVin());
+            preparedStatement.setString(2, vehicle.getMake());
+            preparedStatement.setString(3, vehicle.getModel());
+            preparedStatement.setInt(4, vehicle.getYear());
+            preparedStatement.setBoolean(5, vehicle.isSold());
+            preparedStatement.setString(6, vehicle.getColor());
+            preparedStatement.setString(7, vehicle.getVehicleType());
+            preparedStatement.setInt(8, vehicle.getOdometer());
+            preparedStatement.setDouble(9, vehicle.getPrice());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Added the vehicle!");
+            } else {
+                System.out.println("Couldn't add the vehicle");
+            }
+        } catch (SQLException e) {
+
+            System.err.println("Error adding thge vehicle" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void removeVehicle(String VIN) {
-        // TODO: Implement the logic to remove a vehicle
-    }
+        String query = "delete from vehicles where vin = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, VIN);
+
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Deleted the vehicle!");
+            } else {
+                System.out.println("Couldn't delete the vehicle");
+            }
+        } catch (SQLException e) {
+
+            System.err.println("Error deleting thge vehicle" + e.getMessage());
+            e.printStackTrace();
+        }    }
 
     public List<Vehicle> searchByPriceRange(double minPrice, double maxPrice) {
-        // TODO: Implement the logic to search vehicles by price range
-        return new ArrayList<>();
+        List<Vehicle> vehicles = new ArrayList<>();
+        String query = "select * from vehicles where price >= ? and price <= ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setDouble(1, minPrice);
+            preparedStatement.setDouble(2, maxPrice);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String vin = resultSet.getString("vin");
+                    String make = resultSet.getString("make");
+                    String model = resultSet.getString("model");
+                    int year = resultSet.getInt("year");
+                    boolean sold = resultSet.getBoolean("sold");
+                    String color = resultSet.getString("color");
+                    String vehicleType = resultSet.getString("vehicleType");
+                    int odometer = resultSet.getInt("odometer");
+                    double price = resultSet.getDouble("price");
+
+                    vehicles.add(new Vehicle(vin, make, model, year, sold, color, vehicleType, odometer, price));
+                }
+            }
+        } catch (SQLException e) {
+
+            System.err.println("Error adding thge vehicle" + e.getMessage());
+            e.printStackTrace();
+        }        return vehicles;
     }
 
     public List<Vehicle> searchByMakeModel(String make, String model) {
