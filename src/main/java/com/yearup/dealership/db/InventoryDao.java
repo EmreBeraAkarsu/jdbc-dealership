@@ -13,10 +13,42 @@ public class InventoryDao {
     }
 
     public void addVehicleToInventory(String vin, int dealershipId) {
-        // TODO: Implement the logic to add a vehicle to the inventory
+        String query = "insert into inventory (vin, dealershipId) Values (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, vin);
+            preparedStatement.setInt(2, dealershipId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Added the vehicle!");
+            } else {
+                System.out.println("Couldn't add the vehicle");
+            }
+        } catch (SQLException e) {
+
+            System.err.println("Error adding thge vehicle" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void removeVehicleFromInventory(String vin) {
-        // TODO: Implement the logic to remove a vehicle from the inventory
-    }
+        String query = "Delete from inventory (vin) Values (?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, vin);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Deleted the vehicle!");
+            } else {
+                System.out.println("Couldn't delete the vehicle");
+            }
+        } catch (SQLException e) {
+
+            System.err.println("Error deleting thge vehicle" + e.getMessage());
+            e.printStackTrace();
+        }    }
 }
